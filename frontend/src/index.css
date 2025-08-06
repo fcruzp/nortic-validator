@@ -1,0 +1,197 @@
+@import "tailwindcss";
+/* Tailwind v4 single-entry import. Custom layers and variables below remain valid. */
+
+/* Tema por defecto claro en body */
+:root {
+  color-scheme: light;
+}
+
+/* Variables de tema */
+:root, .light {
+  --bg-page: #f8fafc;            /* slate-50 */
+  --bg-elev: #ffffff;            /* white */
+  --bg-muted: #f1f5f9;           /* slate-100 */
+  --border: #e2e8f0;             /* slate-200 */
+  --ring: #e2e8f0;               /* slate-200 */
+  --text-primary: #0f172a;       /* slate-900 */
+  --text-secondary: #475569;     /* slate-600 */
+  --muted: #64748b;              /* slate-500 */
+  --brand: #2563eb;              /* blue-600 */
+  --brand-2: #4f46e5;            /* indigo-600 */
+  --success: #16a34a;            /* green-600 */
+  --warning: #d97706;            /* amber-600 */
+  --danger: #dc2626;             /* red-600 */
+  --chip-bg: #f8fafc;            /* slate-50 */
+}
+.dark {
+  --bg-page: #0b1220;            /* slate-950 approx */
+  --bg-elev: #0f172a;            /* slate-900 */
+  --bg-muted: #111827;           /* gray-900-ish */
+  --border: #1f2937;             /* gray-800-ish */
+  --ring: #334155;               /* slate-700 */
+  --text-primary: #e2e8f0;       /* slate-200 */
+  --text-secondary: #94a3b8;     /* slate-400 */
+  --muted: #94a3b8;              /* slate-400 */
+  --brand: #60a5fa;              /* blue-400 */
+  --brand-2: #818cf8;            /* indigo-400 */
+  --success: #22c55e;            /* green-500 */
+  --warning: #f59e0b;            /* amber-500 */
+  --danger: #ef4444;             /* red-500 */
+  --chip-bg: #0b1220;            /* page bg */
+}
+
+/* Fondo y texto base */
+html, body, #root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Estilos base para tipografía y elementos */
+@layer base {
+  html {
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em; /* tracking-[-0.025em] */
+    font-weight: 600; /* font-semibold */
+    color: var(--text-primary);
+  }
+  h1 { font-size: 1.875rem; line-height: 2.25rem; } /* text-3xl */
+  @media (min-width: 768px) {
+    h1 { font-size: 2.25rem; line-height: 2.5rem; } /* md:text-4xl */
+  }
+  h2 { font-size: 1.5rem; line-height: 2rem; } /* text-2xl */
+  @media (min-width: 768px) {
+    h2 { font-size: 1.875rem; line-height: 2.25rem; } /* md:text-3xl */
+  }
+  h3 { font-size: 1.25rem; line-height: 1.75rem; } /* text-xl */
+  @media (min-width: 768px) {
+    h3 { font-size: 1.5rem; line-height: 2rem; } /* md:text-2xl */
+  }
+  p, span, li, div {
+    color: var(--text-primary);
+  }
+  a {
+    color: var(--brand);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Componentes básicos reutilizables */
+@layer components {
+  .card {
+    /* Tailwind @apply removed for CSS linter compatibility */
+    border-radius: 1rem; /* rounded-2xl */
+    /* shadow-md */
+    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.08), 0 1px 1px rgba(2, 6, 23, 0.06);
+    border-width: 1px; /* ring-1 */
+    padding: 1.5rem; /* p-6 */
+    background: var(--bg-elev);
+    /* extra soft elevation from original custom rule */
+    box-shadow: 0 4px 14px rgba(2, 6, 23, 0.06);
+    border-color: var(--border);
+  }
+  @media (min-width: 768px) {
+    .card {
+      padding: 1.75rem; /* md:p-7 */
+    }
+  }
+  .chip {
+    display: inline-flex; align-items: center;
+    padding-left: 0.5rem; padding-right: 0.5rem;
+    padding-top: 0.25rem; padding-bottom: 0.25rem;
+    font-size: 11px; font-weight: 500; /* font-medium */
+    border-radius: 9999px; border-width: 1px;
+    background: var(--chip-bg);
+    border-color: var(--border);
+    color: var(--text-secondary);
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 0.75rem; /* rounded-xl */
+    padding-left: 1rem; padding-right: 1rem; /* px-4 */
+    padding-top: 0.5rem; padding-bottom: 0.5rem; /* py-2 */
+    font-weight: 500; /* font-medium */
+    transition: all 150ms ease;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    background: var(--bg-elev);
+  }
+  .btn:hover {
+    background: var(--bg-muted);
+  }
+  .btn-primary {
+    color: #ffffff; /* text-white */
+    box-shadow: 0 1px 2px rgba(2,6,23,0.08), 0 1px 1px rgba(2,6,23,0.06); /* shadow */
+    background-image: linear-gradient(90deg, var(--brand), var(--brand-2));
+    border-color: transparent;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.02);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+  }
+  .surface-muted {
+    background: var(--bg-muted);
+    border-color: var(--border);
+  }
+  .input {
+    width: 100%;
+    padding-left: 0.75rem; padding-right: 0.75rem; /* px-3 */
+    padding-top: 0.625rem; padding-bottom: 0.625rem; /* py-2.5 */
+    border-radius: 0.75rem; /* rounded-xl */
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    outline-color: transparent;
+    box-shadow: 0 0 0 0 var(--ring);
+  }
+  .input::placeholder {
+    color: var(--muted);
+  }
+  .input:focus {
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    border-color: #93c5fd; /* blue-300 */
+  }
+  .kpi {
+    border-radius: 0.75rem; /* rounded-xl */
+    padding: 1rem; /* p-4 */
+    text-align: center;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+  }
+}
+
+/* Utilidades suaves para bordes, sombras y anillos */
+@layer utilities {
+  .ring-soft {
+    box-shadow: 0 0 0 1px var(--ring);
+  }
+  .shadow-soft {
+    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.08);
+  }
+
+  /* Panel de demostración que usa variables de tema directamente.
+     Esto NO depende de utilidades dark: de Tailwind, sólo de .dark en <html> y las CSS vars de :root/.dark */
+  .demo-panel {
+    border-radius: 0.75rem; /* rounded-xl */
+    border-width: 1px;
+    padding: 1rem; /* p-4 */
+    background: var(--bg-elev);
+    color: var(--text-primary);
+    border-color: var(--border);
+  }
+}
+
+/* Evitar transiciones al cambiar tema para no ver ghosting */
+.dark * {
+  transition: none !important;
+}

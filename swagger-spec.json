@@ -1,0 +1,1182 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NORTIC A2 Validator API",
+    "description": "API completa para el Sistema de Validación de Sitios Web Gubernamentales según la norma NORTIC A2 de la OGTIC en República Dominicana. Esta API permite realizar análisis automatizados de sitios web gubernamentales evaluando usabilidad, diseño, contenido, seguridad, SEO y accesibilidad.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "NORTIC A2 Validator",
+      "email": "soporte@nortic-validator.gob.do"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor de desarrollo local"
+    },
+    {
+      "url": "https://api.nortic-validator.gob.do",
+      "description": "Servidor de producción"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Análisis NORTIC",
+      "description": "Endpoints principales para gestión de análisis NORTIC A2"
+    },
+    {
+      "name": "Resultados",
+      "description": "Endpoints para obtener resultados de análisis"
+    },
+    {
+      "name": "Historial",
+      "description": "Endpoints para gestión del historial de análisis"
+    },
+    {
+      "name": "Reportes",
+      "description": "Endpoints para generación de reportes"
+    },
+    {
+      "name": "Legacy",
+      "description": "Endpoints de compatibilidad con versiones anteriores"
+    },
+    {
+      "name": "Sistema",
+      "description": "Endpoints de estado y salud del sistema"
+    }
+  ],
+  "paths": {
+    "/api/nortic-analysis": {
+      "post": {
+        "tags": ["Análisis NORTIC"],
+        "summary": "Iniciar nuevo análisis NORTIC A2",
+        "description": "Inicia un análisis completo de un sitio web gubernamental según la norma NORTIC A2. El análisis incluye evaluación de usabilidad, diseño y layout, contenido, seguridad, SEO y accesibilidad. El proceso es asíncrono y se puede monitorear a través de WebSocket o endpoints de estado.",
+        "operationId": "startNorticAnalysis",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Análisis básico",
+                  "description": "Análisis completo con configuración por defecto",
+                  "value": {
+                    "url": "https://presidencia.gob.do"
+                  }
+                },
+                "custom": {
+                  "summary": "Análisis personalizado",
+                  "description": "Análisis con categorías específicas y opciones personalizadas",
+                  "value": {
+                    "url": "https://ogtic.gob.do",
+                    "testCategories": ["usability", "security", "accessibility"],
+                    "options": {
+                      "timeout": 90000,
+                      "waitForNetworkIdle": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análisis iniciado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisStartResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Respuesta exitosa",
+                    "value": {
+                      "analysisId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "url": "https://presidencia.gob.do",
+                      "status": "in_progress",
+                      "startTime": "2025-07-30T04:30:00.000Z",
+                      "estimatedDuration": 120
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en la solicitud",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missing_url": {
+                    "summary": "URL faltante",
+                    "value": {
+                      "error": "URL is required"
+                    }
+                  },
+                  "invalid_url": {
+                    "summary": "URL inválida",
+                    "value": {
+                      "error": "Invalid URL format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "server_error": {
+                    "summary": "Error del servidor",
+                    "value": {
+                      "error": "Failed to start analysis",
+                      "details": "Database connection failed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nortic-analysis/{analysisId}/status": {
+      "get": {
+        "tags": ["Análisis NORTIC"],
+        "summary": "Obtener estado del análisis",
+        "description": "Obtiene el estado actual de un análisis específico, incluyendo información sobre el progreso, tiempo de inicio, finalización y puntuación general si está disponible.",
+        "operationId": "getAnalysisStatus",
+        "parameters": [
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "description": "ID único del análisis",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado del análisis obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisStatus"
+                },
+                "examples": {
+                  "in_progress": {
+                    "summary": "Análisis en progreso",
+                    "value": {
+                      "analysisId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "url": "https://presidencia.gob.do",
+                      "status": "in_progress",
+                      "startTime": "2025-07-30T04:30:00.000Z",
+                      "endTime": null,
+                      "overallScore": null,
+                      "complianceLevel": null
+                    }
+                  },
+                  "completed": {
+                    "summary": "Análisis completado",
+                    "value": {
+                      "analysisId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "url": "https://presidencia.gob.do",
+                      "status": "completed",
+                      "startTime": "2025-07-30T04:30:00.000Z",
+                      "endTime": "2025-07-30T04:32:15.000Z",
+                      "overallScore": 78,
+                      "complianceLevel": "Parcial"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Análisis no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Análisis no encontrado",
+                    "value": {
+                      "error": "Analysis not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nortic-analysis/{analysisId}/results": {
+      "get": {
+        "tags": ["Resultados"],
+        "summary": "Obtener resultados resumidos del análisis",
+        "description": "Obtiene los resultados resumidos de un análisis completado, incluyendo puntuación general, nivel de cumplimiento y puntuaciones por categoría (usabilidad, diseño, contenido, seguridad, SEO, accesibilidad).",
+        "operationId": "getAnalysisResults",
+        "parameters": [
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "description": "ID único del análisis",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                },
+                "examples": {
+                  "complete_results": {
+                    "summary": "Resultados completos",
+                    "value": {
+                      "analysisId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "url": "https://presidencia.gob.do",
+                      "overallScore": 78,
+                      "complianceLevel": "Parcial",
+                      "categories": {
+                        "usability": {
+                          "score": 85,
+                          "status": "passed"
+                        },
+                        "layout": {
+                          "score": 72,
+                          "status": "warning"
+                        },
+                        "content": {
+                          "score": 68,
+                          "status": "warning"
+                        },
+                        "security": {
+                          "score": 90,
+                          "status": "passed"
+                        },
+                        "seo": {
+                          "score": 75,
+                          "status": "warning"
+                        },
+                        "accessibility": {
+                          "score": 80,
+                          "status": "passed"
+                        }
+                      },
+                      "startTime": "2025-07-30T04:30:00.000Z",
+                      "endTime": "2025-07-30T04:32:15.000Z",
+                      "duration": 135
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Análisis no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Análisis no completado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "not_completed": {
+                    "summary": "Análisis no completado",
+                    "value": {
+                      "error": "Analysis is not completed. Status: in_progress"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nortic-analysis/{analysisId}/detailed": {
+      "get": {
+        "tags": ["Resultados"],
+        "summary": "Obtener resultados detallados del análisis",
+        "description": "Obtiene los resultados detallados de un análisis, incluyendo información completa del análisis, resultados individuales de cada prueba con detalles técnicos, y violaciones de accesibilidad detectadas.",
+        "operationId": "getDetailedResults",
+        "parameters": [
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "description": "ID único del análisis",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados detallados obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailedResults"
+                },
+                "examples": {
+                  "detailed_results": {
+                    "summary": "Resultados detallados completos",
+                    "value": {
+                      "analysis": {
+                        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                        "url": "https://presidencia.gob.do",
+                        "status": "completed",
+                        "overall_score": 78,
+                        "compliance_level": "Parcial",
+                        "start_time": "2025-07-30T04:30:00.000Z",
+                        "end_time": "2025-07-30T04:32:15.000Z",
+                        "duration": 135
+                      },
+                      "testResults": [
+                        {
+                          "test_name": "Tiempo de Carga",
+                          "category": "usability",
+                          "status": "passed",
+                          "score": 90,
+                          "message": "Página carga en menos de 3 segundos",
+                          "details": {
+                            "loadTime": 1.8,
+                            "threshold": 3.0,
+                            "metrics": {
+                              "domContentLoaded": 1.2,
+                              "firstContentfulPaint": 0.9
+                            }
+                          }
+                        }
+                      ],
+                      "violations": [
+                        {
+                          "rule_id": "color-contrast",
+                          "impact": "serious",
+                          "description": "Elementos deben tener suficiente contraste de color",
+                          "help_url": "https://dequeuniversity.com/rules/axe/4.4/color-contrast",
+                          "selector": ".header-text",
+                          "html": "<span class=\"header-text\">Texto con bajo contraste</span>"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Análisis no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nortic-analysis/history": {
+      "get": {
+        "tags": ["Historial"],
+        "summary": "Obtener historial de análisis",
+        "description": "Obtiene el historial paginado de análisis realizados, con opción de filtrar por URL específica. Incluye información de paginación para navegación eficiente.",
+        "operationId": "getAnalysisHistory",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Número de página (comenzando en 1)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Número de elementos por página",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "example": 5
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filtrar por URL específica",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "example": "https://presidencia.gob.do"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedHistory"
+                },
+                "examples": {
+                  "history_page": {
+                    "summary": "Página de historial",
+                    "value": {
+                      "analyses": [
+                        {
+                          "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                          "url": "https://presidencia.gob.do",
+                          "status": "completed",
+                          "overall_score": 78,
+                          "compliance_level": "Parcial",
+                          "created_at": "2025-07-30T04:30:00.000Z",
+                          "updated_at": "2025-07-30T04:32:15.000Z"
+                        }
+                      ],
+                      "pagination": {
+                        "page": 1,
+                        "limit": 5,
+                        "total": 25,
+                        "totalPages": 5,
+                        "hasNext": true,
+                        "hasPrev": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nortic-analysis/{analysisId}/report": {
+      "get": {
+        "tags": ["Reportes"],
+        "summary": "Generar reporte PDF del análisis",
+        "description": "Genera un reporte en formato PDF con los resultados completos del análisis NORTIC A2. El reporte incluye resumen ejecutivo, resultados detallados por categoría, recomendaciones y anexos técnicos.",
+        "operationId": "generatePDFReport",
+        "parameters": [
+          {
+            "name": "analysisId",
+            "in": "path",
+            "required": true,
+            "description": "ID único del análisis",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Información del reporte generado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportResponse"
+                },
+                "examples": {
+                  "report_info": {
+                    "summary": "Información del reporte",
+                    "value": {
+                      "message": "PDF report generation not implemented yet",
+                      "analysisId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                      "downloadUrl": "/api/nortic-analysis/f47ac10b-58cc-4372-a567-0e02b2c3d479/report.pdf"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Análisis no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "tags": ["Legacy"],
+        "summary": "Iniciar análisis (endpoint legacy)",
+        "description": "Endpoint de compatibilidad con versiones anteriores. Se recomienda usar /api/nortic-analysis para nuevas implementaciones.",
+        "operationId": "legacyAnalyze",
+        "deprecated": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["url"],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL del sitio web a analizar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análisis iniciado (formato legacy)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegacyAnalyzeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos": {
+      "get": {
+        "tags": ["Legacy"],
+        "summary": "Obtener proyectos (endpoint legacy)",
+        "description": "Endpoint de compatibilidad que devuelve el historial en formato legacy. Se recomienda usar /api/nortic-analysis/history para nuevas implementaciones.",
+        "operationId": "legacyProjects",
+        "deprecated": true,
+        "responses": {
+          "200": {
+            "description": "Lista de proyectos en formato legacy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LegacyProject"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Verificar estado del sistema",
+        "description": "Endpoint de salud para verificar que el sistema esté funcionando correctamente. Útil para monitoreo y balanceadores de carga.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Sistema funcionando correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "examples": {
+                  "healthy": {
+                    "summary": "Sistema saludable",
+                    "value": {
+                      "status": "healthy",
+                      "timestamp": "2025-07-30T04:30:00.000Z",
+                      "version": "1.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisRequest": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL del sitio web gubernamental a analizar",
+            "example": "https://presidencia.gob.do",
+            "pattern": "^https?://.+\\.(gob\\.do|gov\\.[a-z]{2,3}).*$"
+          },
+          "testCategories": {
+            "type": "array",
+            "description": "Categorías específicas de pruebas a ejecutar",
+            "items": {
+              "type": "string",
+              "enum": ["usability", "layout", "content", "security", "seo", "accessibility"]
+            },
+            "default": ["usability", "layout", "content", "security", "seo", "accessibility"],
+            "example": ["usability", "security", "accessibility"]
+          },
+          "options": {
+            "type": "object",
+            "description": "Opciones adicionales para el análisis",
+            "properties": {
+              "timeout": {
+                "type": "integer",
+                "description": "Tiempo límite en milisegundos para cargar la página",
+                "minimum": 10000,
+                "maximum": 300000,
+                "default": 60000,
+                "example": 90000
+              },
+              "waitForNetworkIdle": {
+                "type": "boolean",
+                "description": "Esperar a que la red esté inactiva antes de analizar",
+                "default": false,
+                "example": true
+              }
+            }
+          }
+        }
+      },
+      "AnalysisStartResponse": {
+        "type": "object",
+        "required": ["analysisId", "url", "status", "startTime", "estimatedDuration"],
+        "properties": {
+          "analysisId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único del análisis generado",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL que se está analizando",
+            "example": "https://presidencia.gob.do"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_progress"],
+            "description": "Estado inicial del análisis",
+            "example": "in_progress"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de inicio del análisis",
+            "example": "2025-07-30T04:30:00.000Z"
+          },
+          "estimatedDuration": {
+            "type": "integer",
+            "description": "Duración estimada del análisis en segundos",
+            "example": 120
+          }
+        }
+      },
+      "AnalysisStatus": {
+        "type": "object",
+        "required": ["analysisId", "url", "status", "startTime"],
+        "properties": {
+          "analysisId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único del análisis"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL analizada"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "failed"],
+            "description": "Estado actual del análisis"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de inicio"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Timestamp de finalización (null si no ha terminado)"
+          },
+          "overallScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Puntuación general del análisis (null si no ha terminado)"
+          },
+          "complianceLevel": {
+            "type": "string",
+            "enum": ["Excelente", "Cumple", "Parcial", "No Cumple"],
+            "nullable": true,
+            "description": "Nivel de cumplimiento NORTIC A2 (null si no ha terminado)"
+          }
+        }
+      },
+      "AnalysisResult": {
+        "type": "object",
+        "required": ["analysisId", "url", "overallScore", "complianceLevel", "categories", "startTime", "endTime", "duration"],
+        "properties": {
+          "analysisId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único del análisis"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL analizada"
+          },
+          "overallScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Puntuación general del análisis"
+          },
+          "complianceLevel": {
+            "type": "string",
+            "enum": ["Excelente", "Cumple", "Parcial", "No Cumple"],
+            "description": "Nivel de cumplimiento NORTIC A2"
+          },
+          "categories": {
+            "type": "object",
+            "description": "Resultados por categoría de análisis",
+            "properties": {
+              "usability": {
+                "$ref": "#/components/schemas/CategoryResult"
+              },
+              "layout": {
+                "$ref": "#/components/schemas/CategoryResult"
+              },
+              "content": {
+                "$ref": "#/components/schemas/CategoryResult"
+              },
+              "security": {
+                "$ref": "#/components/schemas/CategoryResult"
+              },
+              "seo": {
+                "$ref": "#/components/schemas/CategoryResult"
+              },
+              "accessibility": {
+                "$ref": "#/components/schemas/CategoryResult"
+              }
+            }
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de inicio del análisis"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de finalización del análisis"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duración del análisis en segundos"
+          }
+        }
+      },
+      "CategoryResult": {
+        "type": "object",
+        "required": ["score", "status"],
+        "properties": {
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Puntuación de la categoría"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["passed", "warning", "failed"],
+            "description": "Estado de la categoría basado en la puntuación"
+          }
+        }
+      },
+      "DetailedResults": {
+        "type": "object",
+        "required": ["analysis", "testResults", "violations"],
+        "properties": {
+          "analysis": {
+            "$ref": "#/components/schemas/AnalysisRecord"
+          },
+          "testResults": {
+            "type": "array",
+            "description": "Resultados detallados de cada prueba individual",
+            "items": {
+              "$ref": "#/components/schemas/TestResult"
+            }
+          },
+          "violations": {
+            "type": "array",
+            "description": "Violaciones de accesibilidad detectadas",
+            "items": {
+              "$ref": "#/components/schemas/AccessibilityViolation"
+            }
+          }
+        }
+      },
+      "AnalysisRecord": {
+        "type": "object",
+        "required": ["id", "url", "status", "start_time"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único del análisis"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL analizada"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "failed"],
+            "description": "Estado del análisis"
+          },
+          "overall_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true,
+            "description": "Puntuación general"
+          },
+          "compliance_level": {
+            "type": "string",
+            "enum": ["Excelente", "Cumple", "Parcial", "No Cumple"],
+            "nullable": true,
+            "description": "Nivel de cumplimiento"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de inicio"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Timestamp de finalización"
+          },
+          "duration": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Duración en segundos"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de creación del registro"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de última actualización"
+          }
+        }
+      },
+      "TestResult": {
+        "type": "object",
+        "required": ["test_name", "category", "status", "score", "message"],
+        "properties": {
+          "test_name": {
+            "type": "string",
+            "description": "Nombre descriptivo de la prueba",
+            "example": "Tiempo de Carga"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["usability", "layout", "content", "security", "seo", "accessibility", "system", "navigation", "http"],
+            "description": "Categoría de la prueba"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["passed", "warning", "failed", "skipped"],
+            "description": "Resultado de la prueba"
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Puntuación de la prueba"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje descriptivo del resultado",
+            "example": "Página carga en menos de 3 segundos"
+          },
+          "details": {
+            "type": "object",
+            "description": "Detalles técnicos específicos de la prueba",
+            "additionalProperties": true,
+            "example": {
+              "loadTime": 1.8,
+              "threshold": 3.0,
+              "metrics": {
+                "domContentLoaded": 1.2,
+                "firstContentfulPaint": 0.9
+              }
+            }
+          }
+        }
+      },
+      "AccessibilityViolation": {
+        "type": "object",
+        "required": ["rule_id", "impact", "description"],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "ID de la regla de accesibilidad violada",
+            "example": "color-contrast"
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["minor", "moderate", "serious", "critical"],
+            "description": "Nivel de impacto de la violación"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción de la violación",
+            "example": "Elementos deben tener suficiente contraste de color"
+          },
+          "help_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL con información adicional sobre la regla",
+            "example": "https://dequeuniversity.com/rules/axe/4.4/color-contrast"
+          },
+          "selector": {
+            "type": "string",
+            "description": "Selector CSS del elemento que viola la regla",
+            "example": ".header-text"
+          },
+          "html": {
+            "type": "string",
+            "description": "HTML del elemento que viola la regla",
+            "example": "<span class=\"header-text\">Texto con bajo contraste</span>"
+          }
+        }
+      },
+      "PaginatedHistory": {
+        "type": "object",
+        "required": ["analyses", "pagination"],
+        "properties": {
+          "analyses": {
+            "type": "array",
+            "description": "Lista de análisis en la página actual",
+            "items": {
+              "$ref": "#/components/schemas/AnalysisRecord"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationInfo"
+          }
+        }
+      },
+      "PaginationInfo": {
+        "type": "object",
+        "required": ["page", "limit", "total", "totalPages", "hasNext", "hasPrev"],
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Página actual"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Elementos por página"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total de elementos"
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total de páginas"
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Indica si hay página siguiente"
+          },
+          "hasPrev": {
+            "type": "boolean",
+            "description": "Indica si hay página anterior"
+          }
+        }
+      },
+      "ReportResponse": {
+        "type": "object",
+        "required": ["message", "analysisId"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje sobre el estado del reporte"
+          },
+          "analysisId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID del análisis"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "URL para descargar el reporte (cuando esté disponible)"
+          }
+        }
+      },
+      "LegacyAnalyzeResponse": {
+        "type": "object",
+        "required": ["success"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica si el análisis se inició exitosamente"
+          },
+          "id": {
+            "type": "string",
+            "description": "ID del análisis (cuando success es true)"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje informativo"
+          },
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error (cuando success es false)"
+          }
+        }
+      },
+      "LegacyProject": {
+        "type": "object",
+        "required": ["id", "url", "resumen", "fecha"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID del proyecto/análisis"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL analizada"
+          },
+          "resumen": {
+            "type": "string",
+            "description": "Resumen del análisis en formato legacy"
+          },
+          "fecha": {
+            "type": "string",
+            "description": "Fecha de creación"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status", "timestamp", "version"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["healthy", "unhealthy"],
+            "description": "Estado del sistema"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de la verificación"
+          },
+          "version": {
+            "type": "string",
+            "description": "Versión de la API",
+            "example": "1.0.0"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error principal"
+          },
+          "details": {
+            "type": "string",
+            "description": "Detalles adicionales del error"
+          }
+        }
+      }
+    }
+  }
+}
+

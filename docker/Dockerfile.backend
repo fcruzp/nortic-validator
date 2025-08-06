@@ -1,0 +1,70 @@
+# Backend Dockerfile (TypeScript/Node.js)
+# Nota: Para soportar Playwright/Chromium, Alpine requiere paquetes del sistema y fuentes.
+FROM node:18-alpine AS deps
+WORKDIR /app
+# Instalar utilidades mínimas
+RUN apk add --no-cache \
+    bash \
+    ca-certificates
+COPY package*.json ./
+# Instalar dependencias de producción
+RUN npm ci --only=production && npm cache clean --force
+# Nota: no instalamos navegadores en esta etapa; se hará en runner para que queden en la capa final
+
+FROM node:18-alpine AS builder
+WORKDIR /app
+# Dependencias mínimas para compilar TypeScript
+RUN apk add --no-cache \
+    bash \
+    ca-certificates
+COPY package*.json tsconfig.json ./
+RUN npm ci && npm cache clean --force
+COPY src ./src
+COPY swagger-spec.json ./swagger-spec.json
+RUN npx tsc
+
+FROM node:18-alpine AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Instalar dependencias del sistema necesarias para ejecutar Chromium en runtime
+RUN apk add --no-cache \
+    dumb-init \
+    bash \
+    udev \
+    ttf-freefont \
+    nss \
+    chromium \
+    harfbuzz \
+    ca-certificates
+
+# Variables para instalación y ubicación de navegadores Playwright
+# Usaremos una ruta fija (/ms-playwright) para persistir en esta capa
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# Copiar node_modules de producción
+COPY --from=deps /app/node_modules ./node_modules
+
+# Instalar los navegadores de Playwright en la capa final (runner)
+# Intentamos con --with-deps (no-op en Alpine) y fallback sin esa opción
+RUN npx playwright install chromium || true
+
+# Crear symlink hacia la ruta esperada por algunas versiones: node_modules/playwright-core/.local-browsers
+# Esto evita errores cuando Playwright intenta buscar en .local-browsers en vez de usar PLAYWRIGHT_BROWSERS_PATH.
+RUN mkdir -p /app/node_modules/playwright-core && \
+    ln -sfn /ms-playwright /app/node_modules/playwright-core/.local-browsers
+
+# Copiar la app compilada
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/swagger-spec.json ./swagger-spec.json
+
+# Data directory for sqlite (mounted via volume)
+RUN mkdir -p /data
+ENV PORT=3000
+ENV DATABASE_PATH=/data/nortic_validator.sqlite
+EXPOSE 3000
+
+# Usar dumb-init como init para manejo correcto de señales
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "dist/index.js"]

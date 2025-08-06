@@ -1,0 +1,60 @@
+# Frontend Dockerfile (Vite production build served by Nginx)
+
+# 1) Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci && npm cache clean --force
+COPY frontend/ .
+# Build static assets to /app/dist
+RUN npm run build
+
+# 2) Runtime stage
+FROM nginx:1.25-alpine AS runner
+# Copy built assets
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Nginx config:
+# - Serve static frontend
+# - Proxy /api and /socket.io to backend service (Docker network: backend:3000)
+# - Support SPA history fallback
+COPY <<'NGINX_CONF' /etc/nginx/conf.d/default.conf
+server {
+  listen 80;
+  server_name _;
+
+  # Increase useful proxy headers and timeouts for long-running requests / websockets
+  proxy_read_timeout 3600s;
+  proxy_send_timeout 3600s;
+
+  # Frontend static files
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # API proxy
+  location /api/ {
+    proxy_pass http://backend:3000/api/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  # WebSocket proxy (socket.io)
+  location /socket.io/ {
+    proxy_pass http://backend:3000/socket.io/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+  }
+
+  # Try files, then fallback to index.html (SPA support)
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
+NGINX_CONF
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

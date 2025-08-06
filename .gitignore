@@ -1,0 +1,48 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+frontend/dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Env/config
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+**/*.log
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker
+docker/*.local.*
+*.pid
+
+# SQLite and local DBs
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Coverage
+coverage/
+
+# Misc
+.tmp/
+temp/
+.cache/
+frontend/.vite/

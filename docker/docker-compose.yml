@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_PATH=/data/nortic_validator.sqlite
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../nortic_validator.sqlite:/data/nortic_validator.sqlite
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: nortic_network
+    driver: bridge
