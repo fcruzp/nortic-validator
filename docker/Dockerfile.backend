@@ -61,7 +61,6 @@ COPY --from=builder /app/swagger-spec.json ./swagger-spec.json
 
 # Data directory for sqlite (mounted via volume)
 RUN mkdir -p /data
-ENV PORT=3000
 ENV DATABASE_PATH=/data/nortic_validator.sqlite
 EXPOSE 3000
 

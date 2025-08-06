@@ -10,6 +10,14 @@ Sistema de validacion de sitios web gubernamentales basado en la norma NORTIC A2
 - [x] **Base de datos**: Almacenamiento persistente de analisis y resultados
 - [x] **API REST**: Endpoints completos para integracion
 
+## Capturas de pantalla
+
+<p align="center">
+  <img src="assets/01.jpg" alt="Pantalla principal" width="32%">
+  <img src="assets/02.jpg" alt="Resultados de analisis" width="32%">
+  <img src="assets/03.jpg" alt="Ejecucion de analisis" width="32%">
+</p>
+
 ## Categorias de Pruebas
 
 ### 1. Usabilidad (Capitulo 2)
