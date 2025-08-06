@@ -1,65 +1,65 @@
 ﻿# Validador NORTIC A2
 
-Sistema de validaciÃ³n de sitios web gubernamentales basado en la norma NORTIC A2 de la OGTIC de RepÃºblica Dominicana.
+Sistema de validacion de sitios web gubernamentales basado en la norma NORTIC A2 de la OGTIC de Republica Dominicana.
 
-## CaracterÃ­sticas
+## Caracteristicas
 
-- âœ… **AnÃ¡lisis completo de NORTIC A2**: Implementa pruebas para los capÃ­tulos 2-7 de la norma
-- âœ… **TecnologÃ­as modernas**: Playwright para automatizaciÃ³n web y Axe-core para accesibilidad
-- âœ… **Interfaz intuitiva**: Frontend React con resultados detallados y progreso en tiempo real
-- âœ… **Base de datos**: Almacenamiento persistente de anÃ¡lisis y resultados
-- âœ… **API REST**: Endpoints completos para integraciÃ³n
+- [x] **Analisis completo de NORTIC A2**: Implementa pruebas para los capitulos 2-7 de la norma
+- [x] **Tecnologias modernas**: Playwright para automatizacion web y Axe-core para accesibilidad
+- [x] **Interfaz intuitiva**: Frontend React con resultados detallados y progreso en tiempo real
+- [x] **Base de datos**: Almacenamiento persistente de analisis y resultados
+- [x] **API REST**: Endpoints completos para integracion
 
-## CategorÃ­as de Pruebas
+## Categorias de Pruebas
 
-### 1. Usabilidad (CapÃ­tulo 2)
-- Tiempo de carga de pÃ¡ginas
+### 1. Usabilidad (Capitulo 2)
+- Tiempo de carga de paginas
 - Compatibilidad con navegadores
-- TecnologÃ­as web modernas
-- Formularios y validaciÃ³n
-- Funcionalidad de bÃºsqueda
+- Tecnologias web modernas
+- Formularios y validacion
+- Funcionalidad de busqueda
 
-### 2. DiseÃ±o y Layout (CapÃ­tulo 3)
+### 2. Diseno y Layout (Capitulo 3)
 - Estructura del header
-- MenÃº de navegaciÃ³n
-- Ãrea de contenido principal
+- Menu de navegacion
+- Area de contenido principal
 - Estructura del footer
 - Identidad gubernamental
-- DiseÃ±o responsivo
+- Diseno responsivo
 
-### 3. Contenido (CapÃ­tulo 4)
-- InformaciÃ³n institucional
-- SecciÃ³n de transparencia
-- InformaciÃ³n de servicios
+### 3. Contenido (Capitulo 4)
+- Informacion institucional
+- Seccion de transparencia
+- Informacion de servicios
 - Datos de contacto
-- SecciÃ³n de noticias
-- InformaciÃ³n legal
+- Seccion de noticias
+- Informacion legal
 
-### 4. Seguridad (CapÃ­tulo 5)
+### 4. Seguridad (Capitulo 5)
 - Certificado HTTPS
-- ValidaciÃ³n de dominio (.gob.do)
+- Validacion de dominio (.gob.do)
 - Headers de seguridad
 - Content Security Policy
 - Seguridad de cookies
 - Seguridad de formularios
 
-### 5. SEO (CapÃ­tulo 6)
+### 5. SEO (Capitulo 6)
 - Meta tags
-- Estructura semÃ¡ntica
+- Estructura semantica
 - Estructura de URLs
 - Sitemap
 - Open Graph tags
 - Datos estructurados
 
-### 6. Accesibilidad (CapÃ­tulo 7)
+### 6. Accesibilidad (Capitulo 7)
 - Cumplimiento WCAG 2.1 AA
-- NavegaciÃ³n por teclado
+- Navegacion por teclado
 - Contraste de colores
 - Texto alternativo
 - Estructura de encabezados
 - Compatibilidad con lectores de pantalla
 
-## InstalaciÃ³n y ConfiguraciÃ³n
+## Instalacion y Configuracion
 
 ### Prerrequisitos
 - Node.js 18+
@@ -74,7 +74,7 @@ npm run build
 npm start
 ```
 
-El servidor backend estarÃ¡ disponible en `http://localhost:3000`
+El servidor backend estara disponible en `http://localhost:3000`
 
 ### Frontend
 
@@ -85,11 +85,11 @@ npm run build
 npm run dev
 ```
 
-El frontend estarÃ¡ disponible en `http://localhost:5173`
+El frontend estara disponible en `http://localhost:5173`
 
 ## Uso de la API
 
-### Iniciar un anÃ¡lisis
+### Iniciar un analisis
 ```bash
 POST /api/nortic-analysis
 Content-Type: application/json
@@ -104,7 +104,7 @@ Content-Type: application/json
 }
 ```
 
-### Verificar estado del anÃ¡lisis
+### Verificar estado del analisis
 ```bash
 GET /api/nortic-analysis/{analysisId}/status
 ```
@@ -119,7 +119,7 @@ GET /api/nortic-analysis/{analysisId}/results
 GET /api/nortic-analysis/{analysisId}/detailed
 ```
 
-### Historial de anÃ¡lisis
+### Historial de analisis
 ```bash
 GET /api/nortic-analysis/history?page=1&limit=10
 ```
@@ -128,55 +128,55 @@ GET /api/nortic-analysis/history?page=1&limit=10
 
 ```
 nortic-validator/
-â”œâ”€â”€ src/
-â”‚   â”œâ”€â”€ models/
-â”‚   â”‚   â””â”€â”€ database.ts          # Modelos de base de datos
-â”‚   â”œâ”€â”€ tests/
-â”‚   â”‚   â”œâ”€â”€ usability.ts         # Pruebas de usabilidad
-â”‚   â”‚   â”œâ”€â”€ layout.ts            # Pruebas de diseÃ±o
-â”‚   â”‚   â”œâ”€â”€ content.ts           # Pruebas de contenido
-â”‚   â”‚   â”œâ”€â”€ security.ts          # Pruebas de seguridad
-â”‚   â”‚   â”œâ”€â”€ seo.ts               # Pruebas de SEO
-â”‚   â”‚   â””â”€â”€ accessibility.ts     # Pruebas de accesibilidad
-â”‚   â”œâ”€â”€ services/
-â”‚   â”‚   â””â”€â”€ nortic-analyzer.ts   # Servicio principal
-â”‚   â””â”€â”€ index.ts                 # Servidor Express
-â”œâ”€â”€ frontend/
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ App.tsx              # Componente principal
-â”‚   â”‚   â””â”€â”€ main.tsx             # Punto de entrada
-â”‚   â””â”€â”€ dist/                    # Build de producciÃ³n
-â””â”€â”€ dist/                        # Build del backend
+├── src/
+│   ├── models/
+│   │   └── database.ts          # Modelos de base de datos
+│   ├── tests/
+│   │   ├── usability.ts         # Pruebas de usabilidad
+│   │   ├── layout.ts            # Pruebas de diseno
+│   │   ├── content.ts           # Pruebas de contenido
+│   │   ├── security.ts          # Pruebas de seguridad
+│   │   ├── seo.ts               # Pruebas de SEO
+│   │   └── accessibility.ts     # Pruebas de accesibilidad
+│   ├── services/
+│   │   └── nortic-analyzer.ts   # Servicio principal
+│   └── index.ts                 # Servidor Express
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx              # Componente principal
+│   │   └── main.tsx             # Punto de entrada
+│   └── dist/                    # Build de produccion
+└── dist/                        # Build del backend
 ```
 
-## Cambios Necesarios en tu CÃ³digo Actual
+## Cambios Necesarios en tu Codigo Actual
 
 ### Backend (index.ts)
 
-Tu archivo actual serÃ¡ reemplazado completamente. Los cambios principales:
+Tu archivo actual sera reemplazado completamente. Los cambios principales:
 
-1. **Nuevos endpoints**: Se agregaron endpoints especÃ­ficos para NORTIC A2
-2. **Base de datos**: ImplementaciÃ³n de SQLite para persistencia
-3. **AnÃ¡lisis asÃ­ncrono**: Los anÃ¡lisis ahora se ejecutan en background
+1. **Nuevos endpoints**: Se agregaron endpoints especificos para NORTIC A2
+2. **Base de datos**: Implementacion de SQLite para persistencia
+3. **Analisis asincrono**: Los analisis ahora se ejecutan en background
 4. **Compatibilidad**: Se mantienen endpoints legacy para compatibilidad
 
 ### Frontend (App.tsx)
 
-Tu archivo actual serÃ¡ actualizado con:
+Tu archivo actual sera actualizado con:
 
-1. **Nueva interfaz**: DiseÃ±o mejorado con Tailwind CSS
-2. **Progreso en tiempo real**: Seguimiento del anÃ¡lisis en progreso
+1. **Nueva interfaz**: Diseno mejorado con Tailwind CSS
+2. **Progreso en tiempo real**: Seguimiento del analisis en progreso
 3. **Resultados detallados**: Vista completa de todas las pruebas
-4. **Historial mejorado**: Mejor visualizaciÃ³n de anÃ¡lisis previos
+4. **Historial mejorado**: Mejor visualizacion de analisis previos
 
-## PuntuaciÃ³n y Niveles de Cumplimiento
+## Puntuacion y Niveles de Cumplimiento
 
-- **90-100 puntos**: Excelente âœ…
-- **80-89 puntos**: Cumple âœ…
-- **60-79 puntos**: Parcial âš ï¸
-- **0-59 puntos**: No Cumple âŒ
+- **90-100 puntos**: Excelente
+- **80-89 puntos**: Cumple
+- **60-79 puntos**: Parcial
+- **0-59 puntos**: No Cumple
 
-## Desarrollo y ContribuciÃ³n
+## Desarrollo y contribucion
 
 ### Ejecutar en modo desarrollo
 
@@ -192,24 +192,24 @@ npm run dev
 
 ### Agregar nuevas pruebas
 
-1. Crear nueva funciÃ³n de prueba en el archivo correspondiente
-2. Agregar la prueba al mÃ©todo `runAllTests()`
-3. Actualizar la documentaciÃ³n
+1. Crear nueva funcion de prueba en el archivo correspondiente
+2. Agregar la prueba al metodo `runAllTests()`
+3. Actualizar la documentacion
 
 ## Dependencias Principales
 
 ### Backend
 - **Express**: Servidor web
-- **Playwright**: AutomatizaciÃ³n del navegador
+- **Playwright**: Automatizacion del navegador
 - **@axe-core/playwright**: Pruebas de accesibilidad
 - **SQLite3**: Base de datos
-- **TypeScript**: Tipado estÃ¡tico
+- **TypeScript**: Tipado estatico
 
 ### Frontend
 - **React**: Framework de UI
 - **Vite**: Build tool
-- **Tailwind CSS**: Estilos (vÃ­a CDN)
-- **TypeScript**: Tipado estÃ¡tico
+- **Tailwind CSS**: Estilos (via CDN)
+- **TypeScript**: Tipado estatico
 
 ## Licencia
 
@@ -217,11 +217,11 @@ MIT
 
 ## Soporte
 
-Para reportar problemas o solicitar caracterÃ­sticas, crear un issue en el repositorio del proyecto.
+Para reportar problemas o solicitar caracteristicas, crear un issue en el repositorio del proyecto.
 
 ---
 
-**Nota**: Este validador implementa las especificaciones de la norma NORTIC A2 de la OGTIC de RepÃºblica Dominicana. Para informaciÃ³n oficial sobre la norma, consultar el sitio web de la OGTIC.
+**Nota**: Este validador implementa las especificaciones de la norma NORTIC A2 de la OGTIC de Republica Dominicana. Para informacion oficial sobre la norma, consultar el sitio web de la OGTIC.
 
 
 
